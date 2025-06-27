@@ -1,0 +1,1084 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "definitions": {
+    "CheckType": {
+      "enum": [
+        "business",
+        "funeralHome",
+        "moneyOrder",
+        "other",
+        "personal"
+      ],
+      "type": "string"
+    },
+    "DispositionType": {
+      "enum": [
+        "burial",
+        "cremation",
+        "other"
+      ],
+      "type": "string"
+    },
+    "EftAccountType": {
+      "enum": [
+        "checking",
+        "other",
+        "savings"
+      ],
+      "type": "string"
+    },
+    "GenderType": {
+      "enum": [
+        "female",
+        "male",
+        "other"
+      ],
+      "type": "string"
+    },
+    "IAddress": {
+      "properties": {
+        "city": {
+          "type": "string"
+        },
+        "line1": {
+          "type": "string"
+        },
+        "line2": {
+          "type": "string"
+        },
+        "state": {
+          "$ref": "#/definitions/IJurisdiction"
+        },
+        "zip": {
+          "type": "string"
+        },
+        "zip+4": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "city",
+        "line1",
+        "state",
+        "zip"
+      ],
+      "type": "object"
+    },
+    "IAgent": {
+      "properties": {
+        "address": {
+          "$ref": "#/definitions/IAddress"
+        },
+        "altAddress": {
+          "$ref": "#/definitions/IAddress"
+        },
+        "branchCode": {
+          "description": "Branch code of the agent/policy.\nThis field is not required in the case of an agent split where the agent is not primary",
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "id": {
+          "description": "An identifier unique to all other party objects in the policy",
+          "type": "string"
+        },
+        "isPrimaryAgent": {
+          "description": "True if this agent is the primary agent on the policy, false if not.\nThis field is only required in the case of agent splits.\nThere may only be one primary agent on any give policy",
+          "type": "boolean"
+        },
+        "name": {
+          "$ref": "#/definitions/IName"
+        },
+        "partyType": {
+          "description": "Distinguishes a person/individual from an organization party",
+          "enum": [
+            "individual"
+          ],
+          "type": "string"
+        },
+        "phoneNumber": {
+          "$ref": "#/definitions/IPhoneNumber"
+        },
+        "producerID": {
+          "type": "string"
+        },
+        "splitPercent": {
+          "default": 100,
+          "description": "The percent of the split associated with the agent.\nThis is only used in the case of an agent split",
+          "type": "number"
+        },
+        "ssn": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "partyType",
+        "producerID"
+      ],
+      "type": "object"
+    },
+    "IBanking": {
+      "properties": {
+        "cc": {
+          "$ref": "#/definitions/ICc"
+        },
+        "directBill": {
+          "$ref": "#/definitions/IDirect"
+        },
+        "eft": {
+          "$ref": "#/definitions/IEft"
+        }
+      },
+      "type": "object"
+    },
+    "IBankingMultiPay": {
+      "properties": {
+        "initial": {
+          "$ref": "#/definitions/IBanking"
+        },
+        "ongoing": {
+          "$ref": "#/definitions/IBanking"
+        }
+      },
+      "required": [
+        "ongoing"
+      ],
+      "type": "object"
+    },
+    "IBeneficiary": {
+      "properties": {
+        "address": {
+          "$ref": "#/definitions/IAddress"
+        },
+        "altAddress": {
+          "$ref": "#/definitions/IAddress"
+        },
+        "email": {
+          "type": "string"
+        },
+        "id": {
+          "description": "An identifier unique to all other party objects in the policy",
+          "type": "string"
+        },
+        "interestPercent": {
+          "default": 100,
+          "description": "Percentage of the interest assigned to the beneficiary.\nThis field is only required for multiple beneficiaries, and must be in each of them.\nIf only a single beneficiary is provided, the value of this fields defaults to 100",
+          "type": "number"
+        },
+        "isPrimaryBeneficiary": {
+          "type": "boolean"
+        },
+        "name": {
+          "$ref": "#/definitions/IName"
+        },
+        "partyId": {
+          "description": "This property is used when the beneficiary of the policy has already been listed as another party.\nThe value of this property should be equal to the 'id' property of the associated party",
+          "type": "string"
+        },
+        "partyType": {
+          "description": "Distinguishes a person/individual from an organization party",
+          "enum": [
+            "estate",
+            "individual"
+          ],
+          "type": "string"
+        },
+        "phoneNumber": {
+          "$ref": "#/definitions/IPhoneNumber"
+        },
+        "relationToInsured": {
+          "$ref": "#/definitions/RelationType",
+          "description": "Relationship of the beneficiary to the primary insured"
+        },
+        "ssn": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "partyType"
+      ],
+      "type": "object"
+    },
+    "ICc": {
+      "properties": {
+        "authNumber": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "authNumber"
+      ],
+      "type": "object"
+    },
+    "IClient": {
+      "properties": {
+        "address": {
+          "$ref": "#/definitions/IAddress"
+        },
+        "altAddress": {
+          "$ref": "#/definitions/IAddress"
+        },
+        "email": {
+          "type": "string"
+        },
+        "id": {
+          "description": "An identifier unique to all other party objects in the policy",
+          "type": "string"
+        },
+        "name": {
+          "$ref": "#/definitions/IName"
+        },
+        "partyType": {
+          "description": "Distinguishes a person/individual from an organization party",
+          "enum": [
+            "individual"
+          ],
+          "type": "string"
+        },
+        "phoneNumber": {
+          "$ref": "#/definitions/IPhoneNumber"
+        },
+        "relationToInsured": {
+          "$ref": "#/definitions/RelationType",
+          "description": "Relationship of the beneficiary to the primary insured"
+        },
+        "ssn": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "partyType"
+      ],
+      "type": "object"
+    },
+    "IContainer": {
+      "properties": {
+        "cost": {
+          "type": "number"
+        },
+        "manufacturer": {
+          "type": "string"
+        },
+        "modelName/Number": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "IDirect": {
+      "properties": {
+        "amount": {
+          "type": "number"
+        },
+        "checkType": {
+          "$ref": "#/definitions/CheckType"
+        },
+        "nameOnCheck": {
+          "type": "string"
+        },
+        "number": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "IEft": {
+      "properties": {
+        "accountNumber": {
+          "type": "string"
+        },
+        "accountType": {
+          "$ref": "#/definitions/EftAccountType"
+        },
+        "bankName": {
+          "type": "string"
+        },
+        "routingNumber": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "accountNumber",
+        "accountType",
+        "bankName",
+        "routingNumber"
+      ],
+      "type": "object"
+    },
+    "IFuneralHome": {
+      "properties": {
+        "address": {
+          "$ref": "#/definitions/IAddress"
+        },
+        "businessName": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "id": {
+          "description": "An identifier unique to all other party objects in the policy",
+          "type": "string"
+        },
+        "partyType": {
+          "description": "Distinguishes a person/individual from an organization party",
+          "enum": [
+            "organization"
+          ],
+          "type": "string"
+        },
+        "phoneNumber": {
+          "$ref": "#/definitions/IPhoneNumber"
+        },
+        "pinID": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "businessName",
+        "id",
+        "partyType"
+      ],
+      "type": "object"
+    },
+    "IGoodsAndServices": {
+      "properties": {
+        "appointmentCode": {
+          "description": "Appointment code is only meaningful for Precoa applications",
+          "type": "string"
+        },
+        "formUsed": {
+          "description": "Name of the G&S Form used",
+          "type": "string"
+        },
+        "funeralHomeServices": {
+          "properties": {
+            "cremationCost": {
+              "description": "Only needed when disposition = \"cremation\"",
+              "type": "number"
+            },
+            "funeralMemorialCost": {
+              "description": "Cost of the funeral/memorial service.\nIf the cost is not applicable or included as part of\na larger package this field should be left out",
+              "type": "number"
+            },
+            "gravesideService": {
+              "description": "Cost of the graveside services.\nIf the cost is not applicable or included as part of\na larger package this field should be left out",
+              "type": "number"
+            },
+            "totalCost": {
+              "description": "Total cost for all funeral-home services. This value should\nbe greater than or equal to the sum of all other funeralHomeService\nitems",
+              "type": "number"
+            }
+          },
+          "type": "object"
+        },
+        "funeralMerchandise": {
+          "properties": {
+            "casket": {
+              "$ref": "#/definitions/IContainer",
+              "description": "This field is required for all North Carolina policies"
+            },
+            "outerBurialContainer": {
+              "$ref": "#/definitions/IContainer"
+            },
+            "totalCost": {
+              "description": "Total cost for all funeral-home merchandise. This value should\nbe greater than or equal to the sum of all other funeralMerchandise\nitems",
+              "type": "number"
+            },
+            "urn": {
+              "$ref": "#/definitions/IContainer"
+            }
+          },
+          "type": "object"
+        },
+        "guaranteedTotal": {
+          "description": "Total cost for all guaranteed services and merchandise",
+          "type": "number"
+        },
+        "nonGuarCashAdvanceTotal": {
+          "description": "Total cost for all non-guaranteed cash advance items",
+          "type": "number"
+        },
+        "stateSpecificData": {
+          "properties": {
+            "TX": {
+              "description": "Texas specific data",
+              "properties": {
+                "guaranteedMerchandiseA": {
+                  "description": "Subtotal of all merchandise/goods from the Texas GSM form.\nThis is the right-hand column of the form",
+                  "type": "number"
+                },
+                "guaranteedServicesA": {
+                  "description": "Subtotal of all services from the Texas GSM form.\nThis is the left-hand column of the form",
+                  "type": "number"
+                },
+                "guaranteedTotalA": {
+                  "description": "Sum of guaranteed services and merchandise.\nValue of the field (A) Total Cost of Guaranteed Items",
+                  "type": "number"
+                },
+                "nonGuaranteedTotalB": {
+                  "description": "Value of the field '(B) TOTAL CASH ADVANCE ITEMS' on\nthe Texas Non-Guaranteed Cash Advance Items form",
+                  "type": "number"
+                },
+                "totalContractPrice": {
+                  "description": "This is the value of the field 'TOTAL CONTRACT PRICE'\nfrom the Texas form (B) Non Guaranteed Cash Advance Items.\nIt's value should be equal to the sum of the properties\n nonGuaranteedTotal_B + guaranteedTotal_A",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "guaranteedMerchandiseA",
+                "guaranteedServicesA",
+                "guaranteedTotalA",
+                "nonGuaranteedTotalB",
+                "totalContractPrice"
+              ],
+              "type": "object"
+            },
+            "WI": {
+              "description": "Wisconsin Specific Data",
+              "properties": {
+                "discounts": {
+                  "description": "\"Dollar value of discounts for the G&S form",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "discounts"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "TX",
+            "WI"
+          ],
+          "type": "object"
+        },
+        "templateUsed": {
+          "description": "AppQore Template used to pre-populate the Goods and Services pages",
+          "type": "string"
+        },
+        "totalFuneralAmount": {
+          "description": "Total cost for all guaranteed and non-guaranteed services and merchandise",
+          "type": "number"
+        },
+        "usedElectronicG&S": {
+          "description": "All other fields are only required if this is true",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "usedElectronicG&S"
+      ],
+      "type": "object"
+    },
+    "IInsured": {
+      "properties": {
+        "address": {
+          "$ref": "#/definitions/IAddress"
+        },
+        "altAddress": {
+          "$ref": "#/definitions/IAddress"
+        },
+        "birthDate": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "gender": {
+          "$ref": "#/definitions/GenderType"
+        },
+        "id": {
+          "description": "An identifier unique to all other party objects in the policy",
+          "type": "string"
+        },
+        "name": {
+          "$ref": "#/definitions/IName"
+        },
+        "partyType": {
+          "description": "Distinguishes a person/individual from an organization party",
+          "enum": [
+            "individual"
+          ],
+          "type": "string"
+        },
+        "phoneNumber": {
+          "$ref": "#/definitions/IPhoneNumber"
+        },
+        "ssn": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "partyType"
+      ],
+      "type": "object"
+    },
+    "IJurisdiction": {
+      "description": "List of valid states for a policy.\nA list of all valid jurisdictions can be found in the\nAWC DB in the table 'States'",
+      "enum": [
+        "",
+        "AK",
+        "AL",
+        "AR",
+        "AZ",
+        "CA",
+        "CO",
+        "CT",
+        "DC",
+        "DE",
+        "FL",
+        "GA",
+        "HI",
+        "IA",
+        "ID",
+        "IL",
+        "IN",
+        "KS",
+        "KY",
+        "LA",
+        "MA",
+        "MD",
+        "ME",
+        "MI",
+        "MN",
+        "MO",
+        "MS",
+        "MT",
+        "NC",
+        "ND",
+        "NE",
+        "NH",
+        "NJ",
+        "NM",
+        "NV",
+        "NY",
+        "OH",
+        "OK",
+        "OR",
+        "PA",
+        "PR",
+        "PW",
+        "RI",
+        "SC",
+        "SD",
+        "TN",
+        "TX",
+        "UT",
+        "UU",
+        "VA",
+        "VI",
+        "VT",
+        "WA",
+        "WI",
+        "WV",
+        "WY"
+      ],
+      "type": "string"
+    },
+    "IMultiPay": {
+      "properties": {
+        "alphaGrowthRate": {
+          "type": "string"
+        },
+        "banking": {
+          "$ref": "#/definitions/IBankingMultiPay"
+        },
+        "billDay": {
+          "type": "number"
+        },
+        "faceAmount": {
+          "type": "number"
+        },
+        "frequency": {
+          "$ref": "#/definitions/PaymentFrequency"
+        },
+        "initialPayment": {
+          "type": "number"
+        },
+        "ongoingPayment": {
+          "type": "number"
+        },
+        "premium": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "banking"
+      ],
+      "type": "object"
+    },
+    "IName": {
+      "properties": {
+        "first": {
+          "type": "string"
+        },
+        "last": {
+          "type": "string"
+        },
+        "middle": {
+          "type": "string"
+        },
+        "suffix": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "first",
+        "last"
+      ],
+      "type": "object"
+    },
+    "IParties": {
+      "properties": {
+        "agents": {
+          "items": {
+            "$ref": "#/definitions/IAgent"
+          },
+          "type": "array"
+        },
+        "beneficiaries": {
+          "items": {
+            "$ref": "#/definitions/IBeneficiary"
+          },
+          "type": "array"
+        },
+        "funeralHome": {
+          "$ref": "#/definitions/IFuneralHome"
+        },
+        "payor": {
+          "$ref": "#/definitions/IClient"
+        },
+        "policyOwner": {
+          "$ref": "#/definitions/IClient"
+        },
+        "primaryInsured": {
+          "$ref": "#/definitions/IInsured"
+        }
+      },
+      "required": [
+        "agents",
+        "beneficiaries",
+        "funeralHome",
+        "primaryInsured"
+      ],
+      "type": "object"
+    },
+    "IPayment": {
+      "properties": {
+        "multiPay": {
+          "$ref": "#/definitions/IMultiPay"
+        },
+        "singlePay": {
+          "$ref": "#/definitions/ISinglePay"
+        }
+      },
+      "type": "object"
+    },
+    "IPhoneNumber": {
+      "properties": {
+        "areaCode": {
+          "description": "3 digit area code of a phone number",
+          "type": "string"
+        },
+        "dialNumber": {
+          "description": "last 7 digits of a phone number",
+          "type": "string"
+        },
+        "extension": {
+          "description": "extension is only used when type is \"work\"",
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/PhoneType",
+          "default": "home",
+          "description": "The type of phone number provided."
+        }
+      },
+      "required": [
+        "dialNumber"
+      ],
+      "type": "object"
+    },
+    "IPolicy": {
+      "properties": {
+        "applicationID": {
+          "description": "The application ID of the policy. This is only needed for policies with a productType of 'Precoa'",
+          "type": "string"
+        },
+        "bumpRate": {
+          "type": "number"
+        },
+        "contractID": {
+          "description": "The product line which the policy belongs to",
+          "type": "string"
+        },
+        "disposition": {
+          "$ref": "#/definitions/DispositionType",
+          "description": "The method in which the primary insured wishes to have their body disposed of"
+        },
+        "formData": {
+          "properties": {
+            "formID": {
+              "description": "The formID. In the pervious XML standard, this was the id property of the FormInstance tag",
+              "type": "string"
+            },
+            "formName": {
+              "type": "string"
+            },
+            "formNumber": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "goodsAndServices": {
+          "$ref": "#/definitions/IGoodsAndServices"
+        },
+        "growthRate": {
+          "type": "number"
+        },
+        "irrevocable": {
+          "type": "boolean"
+        },
+        "jurisdiction": {
+          "$ref": "#/definitions/IJurisdiction"
+        },
+        "mailto": {
+          "$ref": "#/definitions/MailingPreferenceType"
+        },
+        "ongoingPolicy#": {
+          "description": "This is only used for down-and-multi policies where it is the multi-pay policy number.\nAt the time of writing, the current format is the single-pay policy number, followed by an A",
+          "type": "string"
+        },
+        "parties": {
+          "$ref": "#/definitions/IParties"
+        },
+        "payPeriod": {
+          "description": "The pay period of the policy. This should be set to 0 for single pay policies",
+          "type": "number"
+        },
+        "payment": {
+          "$ref": "#/definitions/IPayment"
+        },
+        "planName": {
+          "description": "Name of the product sold by the referenced policy.\nWhile not included in the schema, the plan must be belong to the specified productType for the JSON to be processed properly.\ne.g. JSON with a productType of 'Preneed' and planName of 'Precoa 10' is not valid",
+          "type": "string"
+        },
+        "policy#": {
+          "description": "Policy Number for the policy. In down-and-multi policies, this is the single-pay policy number",
+          "type": "string"
+        },
+        "policyCreatedDate": {
+          "description": "Date/Time which the JSON was generated. Must use the ISO8601 format",
+          "type": "string"
+        },
+        "primaryInsuredIsOwner": {
+          "type": "boolean"
+        },
+        "productType": {
+          "$ref": "#/definitions/ProductType"
+        },
+        "replacement": {
+          "$ref": "#/definitions/IReplacement",
+          "description": "Information about the policy being a replacement for an existing policy"
+        },
+        "signatureInfo": {
+          "$ref": "#/definitions/ISignatureInfo"
+        },
+        "totalFuneralPrice": {
+          "description": "The total cost of the funeral including tax. This value is calculated by summing A + B + C on the Goods and Services form",
+          "type": "number"
+        },
+        "underwritingClass": {
+          "$ref": "#/definitions/UnderwritingClassType",
+          "description": "The underwriting class of the policy"
+        },
+        "underwritingClassOngoing": {
+          "$ref": "#/definitions/UnderwritingClassType",
+          "description": "The underwriting class of the ongoing policy (multi-pay) in down-and-multi"
+        }
+      },
+      "required": [
+        "bumpRate",
+        "disposition",
+        "growthRate",
+        "irrevocable",
+        "jurisdiction",
+        "mailto",
+        "parties",
+        "payPeriod",
+        "payment",
+        "planName",
+        "policy#",
+        "primaryInsuredIsOwner",
+        "productType",
+        "replacement",
+        "signatureInfo",
+        "totalFuneralPrice",
+        "underwritingClass"
+      ],
+      "type": "object"
+    },
+    "IReplacement": {
+      "properties": {
+        "is1035": {
+          "description": "Boolean representing if the policy is funded using a 1035 exchange\nRequired if isReplacement is true",
+          "type": "boolean"
+        },
+        "isReplacement": {
+          "type": "boolean"
+        },
+        "replacedPolicy": {
+          "description": "Information about the policy being replaced\nRequired if isReplacement is true",
+          "properties": {
+            "companyAddress": {
+              "$ref": "#/definitions/IAddress",
+              "description": "Address of the company servicing the policy to be replaced"
+            },
+            "companyName": {
+              "description": "Name of the company servicing the policy to be replaced",
+              "type": "string"
+            },
+            "insuredName": {
+              "description": "Name of the insured on the policy being replaced\nShould use the format First, Last, MI",
+              "type": "string"
+            },
+            "policyId": {
+              "description": "The id or policy number of the policy being replaced",
+              "type": "string"
+            }
+          },
+          "required": [
+            "companyName",
+            "policyId"
+          ],
+          "type": "object"
+        },
+        "stateSpecific": {
+          "description": "State specific fields about the replacement.\nRequired if isReplacement is true",
+          "properties": {
+            "FL": {
+              "description": "Florida specific data",
+              "properties": {
+                "CIF": {
+                  "description": "Answer to Florida 'Comparative Information Form' question",
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "CIF"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "FL"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "isReplacement"
+      ],
+      "type": "object"
+    },
+    "ISignatureInfo": {
+      "properties": {
+        "signatureDate": {
+          "description": "Date/Time which the owner signed the policy. Must use the ISO8601 format. Only required when signed is true",
+          "type": "string"
+        },
+        "signatureRole": {
+          "$ref": "#/definitions/SignatureRoleType",
+          "description": "Party signing the application"
+        },
+        "signed": {
+          "description": "True if the policy has a physical or e-signature, false otherwise",
+          "type": "boolean"
+        },
+        "signedOnBehalfOf": {
+          "description": "True if the individual represented by 'signatureRole' signed for themselves, false otherwise",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "signed"
+      ],
+      "type": "object"
+    },
+    "ISinglePay": {
+      "properties": {
+        "alphaGrowthRate": {
+          "type": "string"
+        },
+        "banking": {
+          "$ref": "#/definitions/IBanking"
+        },
+        "faceAmount": {
+          "type": "number"
+        },
+        "premium": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "banking"
+      ],
+      "type": "object"
+    },
+    "MailingPreferenceType": {
+      "enum": [
+        "agent",
+        "funeralHome",
+        "other",
+        "owner",
+        "unknown"
+      ],
+      "type": "string"
+    },
+    "PaymentFrequency": {
+      "enum": [
+        "A",
+        "M",
+        "Q",
+        "S",
+        "X"
+      ],
+      "type": "string"
+    },
+    "PhoneType": {
+      "enum": [
+        "home",
+        "mobile",
+        "other",
+        "work"
+      ],
+      "type": "string"
+    },
+    "ProductType": {
+      "enum": [
+        "AssetGuard",
+        "Precoa",
+        "Preneed"
+      ],
+      "type": "string"
+    },
+    "RelationType": {
+      "enum": [
+        "business",
+        "child",
+        "employer",
+        "estate",
+        "funeralHome",
+        "grandChild",
+        "grandParent",
+        "grandchild",
+        "grandparent",
+        "other",
+        "owner",
+        "parent",
+        "sibling",
+        "spouse",
+        "trust"
+      ],
+      "type": "string"
+    },
+    "SignatureRoleType": {
+      "enum": [
+        "insured",
+        "owner"
+      ],
+      "type": "string"
+    },
+    "UnderwritingClassType": {
+      "enum": [
+        "A",
+        "B",
+        "Z"
+      ],
+      "type": "string"
+    }
+  },
+  "properties": {
+    "fileName": {
+      "description": "Field used internally by DISCo",
+      "type": "string"
+    },
+    "image": {
+      "properties": {
+        "data": {
+          "description": "Base64 encoded byte-stream of the policy document",
+          "type": "string"
+        },
+        "format": {
+          "description": "File type of the embedded document",
+          "enum": [
+            "PDF",
+            "TIFF"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "data",
+        "format"
+      ],
+      "type": "object"
+    },
+    "isValid": {
+      "enum": [
+        true
+      ],
+      "type": "boolean"
+    },
+    "metadata": {
+      "properties": {
+        "carrierCode": {
+          "type": "string"
+        },
+        "dateTimeCreated": {
+          "description": "Date/Time which the JSON was generated. Must use the ISO8601 format",
+          "type": "string"
+        },
+        "digest": {
+          "description": "SHA-256 digest of the JSON document. Included to ensure data integrity",
+          "type": "string"
+        },
+        "jsonVersion": {
+          "description": "Version of this schema which was used to generate the document. Included to allow for backwards compatibility",
+          "type": "string"
+        },
+        "vendorID": {
+          "description": "ID fo the vendor/application which generated the policy",
+          "type": "string"
+        }
+      },
+      "required": [
+        "jsonVersion",
+        "vendorID"
+      ],
+      "type": "object"
+    },
+    "policy": {
+      "$ref": "#/definitions/IPolicy"
+    }
+  },
+  "required": [
+    "image",
+    "isValid",
+    "metadata",
+    "policy"
+  ],
+  "type": "object"
+}
