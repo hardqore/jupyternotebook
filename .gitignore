@@ -1,0 +1,11 @@
+# Ignore all log files
+*.log
+*.gz
+*.csv
+*.xlsx
+
+# Ignore the build directory
+/build/
+
+# Ignore specific temporary files
+temp_file.tmp
