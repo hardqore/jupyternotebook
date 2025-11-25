@@ -3,7 +3,7 @@
 *.gz
 *.csv
 *.xlsx
-
+*.zzz
 # Ignore the build directory
 /build/
 
