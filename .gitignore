@@ -4,6 +4,9 @@
 *.csv
 *.xlsx
 *.zzz
+*.zyy
+*.ttt
+*.xxy
 # Ignore the build directory
 /build/
 
