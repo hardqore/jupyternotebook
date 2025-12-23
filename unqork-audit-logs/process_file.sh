@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # --- Configuration Variables ---
-TARGET_DIR="./2025-november-december"       # <--- SET YOUR SPECIFIC DIRECTORY PATH HERE
-OUTPUT_CSV_FILE="2025-november-december-output.csv"
+TARGET_DIR="./2025-december"       # <--- SET YOUR SPECIFIC DIRECTORY PATH HERE
+OUTPUT_CSV_FILE="2025-december-output.csv"
 # -------------------------------
 
 echo "Starting batch processing for all files in directory: $TARGET_DIR"
@@ -20,7 +20,7 @@ if [ -f "$OUTPUT_CSV_FILE" ]; then
 fi
 
 # 1. Print the CSV Header ONCE at the beginning of the combined file
-echo '"userid","ipaddress","timestamp"' > "$OUTPUT_CSV_FILE"
+echo '"submissionid","userid","ipaddress","timestamp"' > "$OUTPUT_CSV_FILE"
 echo "Header written."
 
 # 2. Loop through every item in the target directory
@@ -33,8 +33,9 @@ find "$TARGET_DIR" -maxdepth 1 -type f | while IFS= read -r INPUT_FILE; do
     # The '>>' appends the data to the existing combined CSV file
     # We rely on jq to silently fail/ignore non-JSON data if it encounters non-compliant files
     jq -r '
-      select(.actor.identifier.value | startswith("ngl")) |
+      select((.actor.identifier.value | startswith("ngl")) and (.object.identifier.type == "submission-id")) |
       [
+    .object.identifier.value,
     .actor.identifier.value,
     .context.clientIp,
     .timestamp
