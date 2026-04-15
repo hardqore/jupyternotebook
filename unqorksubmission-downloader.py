@@ -2,47 +2,125 @@ import subprocess
 import requests
 import json
 import pandas as pd
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import getpass
+import time
+from typing import Final
+import sys
 
-def get_download_url(job_details: str, bearer_token: str):
+PRECOA_WORKFLOW_ID: Final = "5eafdf4ba6690f01f847b95a"
+PRENEED_WORKFLOW_ID: Final = "5eb0182c3b877e01f970ffa3"
+ALLOWED_WORKFLOWS: Final = [PRECOA_WORKFLOW_ID, PRENEED_WORKFLOW_ID]
+AUTH_ENDPOINT: Final = "https://appqore.mynglic.com/api/1.0/oauth2/access_token"
+your_username: str
+your_password: str
+
+def get_files_list(job_id: str):
+    try:
+        while True:
+            status = get_job_status(jobid)
+            print(f"Current status: {status}")
+        
+            # 2. Check the condition to exit
+            if status == 'completed':
+                print("Status is complete! retreving the filepaths to download ...")
+                return get_job_details(jobid, bearer_token)
+                break
+            
+            # 3. Wait for 5 minutes (300 seconds) before trying again
+            print("Waiting 5 minutes...")
+            time.sleep(300)
+
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+
+def download_files_from_urls(files: list[str]):
+    for file in files:
+        api_endpoint = f"https://appqore.mynglic.com/api{file}"
+    
+        filename = file.split("/")[-1]  # Get the last part of the URL after the last '/'
+
+        # Construct the curl command
+        command = [
+            "curl",
+            "-s",  # Suppress progress meter
+            "-o", filename,  # Save the downloaded file with the specified filename
+            api_endpoint  # The URL to download
+        ]
+    
+        # Add bearer token header if provided
+        bearer_token = get_bearer_token()
+        if bearer_token():
+            command.extend(["-H", f"Authorization: Bearer {bearer_token}"])
+    
+        try:
+            subprocess.run(command, check=True)  # check=True raises an exception for non-zero exit codes
+    
+            print(f"Downloaded '{api_endpoint}' and saved as '{filename}'")
+    
+        except FileNotFoundError:
+            print("Error: 'curl' command not found. Please ensure curl is installed and in your system's PATH.")
+        except subprocess.CalledProcessError as e:
+            print(f"Error downloading '{url}': {e}")
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
+
+
+def get_filepath_list(job_details: list[str]):
     api_endpoint = "https://appqore.mynglic.com/fbu/uapi/bulkOperations/downloadLink"
 
-    payload = { 
-        "fileLocation": job_details
-    }
+    files = []
+    
+    for job_detail in job_details:
+    
+        command = [
+            "curl", "-X", "POST", api_endpoint,
+            "-H", f"Authorization: Bearer {get_bearer_token()}",
+            "-H", "Content-Type: application/json",
+            "-d", json.dumps({"fileLocation": job_detail["destination"]["location"]})
+        ]
 
-    json_data = json.dumps(payload)
+        try:
+            result = subprocess.run(command, capture_output=True, text=True)   
+            json_data = json.loads(result.stdout)
+            files.append(json_data["downloadLink"])
+    
+        except FileNotFoundError:
+            print("Error: 'curl' command not found. Please ensure curl is installed and in your system's PATH.")
+            return None
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            return None
+    return files
 
-    command = [
-        "curl", "-X", "POST", api_endpoint,
-        "-H", f"Authorization: Bearer {bearer_token}",
-        "-H", "Content-Type: application/json",
-        "-d", json_data
-    ]
-
-    try:
-        # Execute the curl command and capture the output
-        result = subprocess.run(command, capture_output=True, text=True)
-
-        # Return the stdout of the curl command
-        return result.stdout
-
-    except FileNotFoundError:
-        print("Error: 'curl' command not found. Please ensure curl is installed and in your system's PATH.")
-        return None
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        return None
-
-
-def get_job_details(download_id: str, bearer_token: str):
+def get_job_status(download_id: str):
     url = f"https://appqore.mynglic.com/fbu/uapi/bulkOperations/jobs/{download_id}"
 
     command = [
         "curl", 
         "-X", "GET", 
-        "-H", f"Authorization: Bearer {bearer_token}",
+        "-H", f"Authorization: Bearer {get_bearer_token()}",
+        "-H", "Content-Type: application/json",
+        url
+    ]    
+    
+    try:
+        result = subprocess.run(command, capture_output=True, text=True)
+        json_data = json.loads(result.stdout)
+
+        return json_data["data"]["status"]
+        
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return None
+
+def get_job_details(download_id: str):
+    url = f"https://appqore.mynglic.com/fbu/uapi/bulkOperations/jobs/{download_id}"
+
+    command = [
+        "curl", 
+        "-X", "GET", 
+        "-H", f"Authorization: Bearer {get_bearer_token()}",
         "-H", "Content-Type: application/json",
         url
     ]    
@@ -51,14 +129,10 @@ def get_job_details(download_id: str, bearer_token: str):
         result = subprocess.run(command, capture_output=True, text=True)
 
         json_data = json.loads(result.stdout)
-
-
         steps = json_data["data"]["steps"]
         files = steps[0]["files"]
 
-        # print(json.dumps(files, indent=4))  
-
-        return files[0]["destination"]["location"]
+        return files
         
     except Exception as e:
         print(f"An error occurred: {e}")
@@ -74,12 +148,12 @@ def get_download_id(json_payload: str):
             print(f"Error decoding JSON for hour {hour}. Output: {output}")
             return None
 
-def get_logs_with_curl(bearer_token: str):
+def get_logs_with_curl(workflow_id: str):
     api_endpoint = "https://appqore.mynglic.com/fbu/uapi/bulkOperations/export"
 
     payload = { 
-        "dataModelOrModuleId": "5eafdf4ba6690f01f847b95a", 
-        "dateFieldStartToFilterOn": "2026-03-18T21:06:59.729Z", 
+        "dataModelOrModuleId": workflow_id, 
+        "dateFieldStartToFilterOn": datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0).strftime("%Y-%m-%dT%H:%M:%S.000Z"), 
         "exportFullRecord": "true", 
         "fileFormat": "JSON" ,
         "name":  "RJWorkflowDataExportTest-Data recorded after this date", 
@@ -91,16 +165,13 @@ def get_logs_with_curl(bearer_token: str):
 
     command = [
         "curl", "-X", "POST", api_endpoint,
-        "-H", f"Authorization: Bearer {bearer_token}",
+        "-H", f"Authorization: Bearer {get_bearer_token()}",
         "-H", "Content-Type: application/json",
         "-d", json_data
     ]
 
     try:
-        # Execute the curl command and capture the output
         result = subprocess.run(command, capture_output=True, text=True)
-
-        # Return the stdout of the curl command
         return result.stdout
 
     except FileNotFoundError:
@@ -110,29 +181,18 @@ def get_logs_with_curl(bearer_token: str):
         print(f"An error occurred: {e}")
         return None
 
-def get_bearer_token(auth_url, username, password):
-    """
-    Obtains a bearer token from an authentication endpoint.
-
-    Args:
-        auth_url (str): The URL of the authentication endpoint.
-        username (str): The user's username.
-        password (str): The user's password.
-
-    Returns:
-        str or None: The bearer token if successful, otherwise None.
-    """
+def get_bearer_token():
     payload = {
-        'username': username,
-        'password': password,
-        'grant_type': 'password' # Common for password grant type in OAuth2
+        'username': your_username,
+        'password': your_password,
+        'grant_type': 'password' 
     }
     headers = {
-        'Content-Type': 'application/x-www-form-urlencoded' # Often required for this grant type
+        'Content-Type': 'application/x-www-form-urlencoded' 
     }
 
     try:
-        response = requests.post(auth_url, data=payload, headers=headers)
+        response = requests.post(AUTH_ENDPOINT, data=payload, headers=headers)
         response.raise_for_status()  # Raise an exception for HTTP errors (4xx or 5xx)
 
         token_data = response.json()
@@ -148,16 +208,24 @@ def get_bearer_token(auth_url, username, password):
         print(f"Error during token request: {e}")
         return None
 
-# Prompt the user for credentials and such
-auth_endpoint = "https://appqore.mynglic.com/api/1.0/oauth2/access_token"
+
 your_username = input("Please enter your username: ")
 your_password = getpass.getpass("Please enter the password: ")
-bearer_token = get_bearer_token(auth_endpoint, your_username, your_password)
-output = get_logs_with_curl(bearer_token)
 
-download_id = get_download_id(output)
-job_details = get_job_details(download_id, bearer_token)
-download_url = get_download_url(job_details, bearer_token)
+workflow_id = input(f"Please enter the workflow_id {ALLOWED_WORKFLOWS}: ")
 
-print(json.dumps(json.loads(download_url), indent=4))
+# Check if the input belongs to the allowed list
+if workflow_id not in ALLOWED_WORKFLOWS:
+    print("Error: Invalid workflow_id. Terminating program.")
+    sys.exit()  # Ends the program's execution
+    
+output = get_logs_with_curl(workflow_id)
+jobid = json.loads(output)["id"]
 
+print(f"Job Id: {jobid}")
+
+file_details_list = get_files_list(jobid)
+
+files_to_download = get_filepath_list(file_details_list)
+
+download_files_from_urls(files_to_download)
