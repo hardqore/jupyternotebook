@@ -24,7 +24,7 @@ def get_files_list(job_id: str):
             # 2. Check the condition to exit
             if status == 'completed':
                 print("Status is complete! retreving the filepaths to download ...")
-                return get_job_details(jobid, bearer_token)
+                return get_job_details(jobid)
                 break
             
             # 3. Wait for 5 minutes (300 seconds) before trying again
@@ -50,7 +50,7 @@ def download_files_from_urls(files: list[str]):
     
         # Add bearer token header if provided
         bearer_token = get_bearer_token()
-        if bearer_token():
+        if bearer_token:
             command.extend(["-H", f"Authorization: Bearer {bearer_token}"])
     
         try:
