@@ -2,7 +2,7 @@ import subprocess
 import requests
 import json
 import pandas as pd
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta, timezone, date
 import getpass
 import time
 from typing import Final
@@ -14,6 +14,7 @@ ALLOWED_WORKFLOWS: Final = [PRECOA_WORKFLOW_ID, PRENEED_WORKFLOW_ID]
 AUTH_ENDPOINT: Final = "https://appqore.mynglic.com/api/1.0/oauth2/access_token"
 your_username: str
 your_password: str
+how_many_days_back: int
 
 def get_files_list(job_id: str):
     try:
@@ -39,6 +40,7 @@ def download_files_from_urls(files: list[str]):
         api_endpoint = f"https://appqore.mynglic.com/api{file}"
     
         filename = file.split("/")[-1]  # Get the last part of the URL after the last '/'
+        filename = f"{filename}.json"
 
         # Construct the curl command
         command = [
@@ -151,9 +153,11 @@ def get_download_id(json_payload: str):
 def get_logs_with_curl(workflow_id: str):
     api_endpoint = "https://appqore.mynglic.com/fbu/uapi/bulkOperations/export"
 
+    past_date = datetime.now(timezone.utc) - timedelta(days=how_many_days_back)
+    
     payload = { 
         "dataModelOrModuleId": workflow_id, 
-        "dateFieldStartToFilterOn": datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0).strftime("%Y-%m-%dT%H:%M:%S.000Z"), 
+        "dateFieldStartToFilterOn": past_date.replace(hour=0, minute=0, second=0, microsecond=0).strftime("%Y-%m-%dT%H:%M:%S.000Z"), 
         "exportFullRecord": "true", 
         "fileFormat": "JSON" ,
         "name":  "RJWorkflowDataExportTest-Data recorded after this date", 
@@ -213,6 +217,8 @@ your_username = input("Please enter your username: ")
 your_password = getpass.getpass("Please enter the password: ")
 
 workflow_id = input(f"Please enter the workflow_id {ALLOWED_WORKFLOWS}: ")
+
+how_many_days_back = int(input("How many days back do you want to download files for? "))
 
 # Check if the input belongs to the allowed list
 if workflow_id not in ALLOWED_WORKFLOWS:
