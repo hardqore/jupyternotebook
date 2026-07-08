@@ -1,0 +1,122 @@
+{
+    "image": {
+        "data": "todo",
+        "format": "PDF"
+    },
+    "isValid": true,
+    "metadata": {
+        "jsonVersion": "1.0.2",
+        "vendorID": "SalesStudio"
+    },
+    "policy": {
+        "policy#": "NP20015731",        
+        "bumpRate": 0,
+        "disposition": "burial",
+        "growthRate": 0,
+        "irrevocable": true,
+        "jurisdiction": "FL",
+        "mailto": "owner",
+        "parties": {
+            "agents": [
+                {
+                    "email": "jgeorge@precoa.com",
+                    "id": "92920316-FF48-EE11-BCFD-00188B3FB15C",
+                    "isPrimaryAgent": true,
+                    "name": {
+                        "first": "Jack",
+                        "last": "George"
+                    },
+                    "phoneNumber": {
+                        "areaCode": "651",
+                        "dialNumber": "2707854",
+                        "type": "mobile"
+                    },
+                    "partyType": "individual"
+                }
+            ],
+            "beneficiaries": [
+                {
+                    "name": {
+                        "first": "bro"
+                    },
+                    "relationToInsured": "bro"
+                }
+            ],
+            "funeralHome": {
+                "address": {
+                    "city": "Minneapolis",
+                    "line1": "3131 Minnehaha Avenue",
+                    "state": "Minnesota",
+                    "zip": "55406"
+                },
+                "businessName": "Bradshaw Funeral and Cremation Services - Minnehaha",
+                "email": null,
+                "id": "0015f00001THLIrAAP",
+                "phoneNumber": {
+                    "areaCode": "(61",
+                    "dialNumber": "2) 724-3621",
+                    "type": "mobile"
+                },
+                "partyType": "organization"
+            },
+            "policyOwner": {
+                "address": {
+                    "city": "Miami",
+                    "line1": "123 Main Street",
+                    "state": "FL",
+                    "zip": "33101"
+                },
+                "email": "mantkiewicz@precoa.com",
+                "name": {
+                    "first": "test",
+                    "last": "acord"
+                },
+                "phoneNumber": "305-555-1234",
+                "ssn": ""
+            },
+            "primaryInsured": {
+                "address": {
+                    "city": "Miami",
+                    "line1": "123 Main Street",
+                    "state": "FL",
+                    "zip": "33101"
+                },
+                "birthDate": "1980-05-15",
+                "email": "test@precoa.com",
+                "gender": "",
+                "id": "c019a562-7453-41e7-abab-4b04ed3956a5",
+                "name": {
+                    "first": "test",
+                    "last": "acord"
+                },
+                "partyType": "individual",
+                "phoneNumber": {
+                    "areaCode": "305",
+                    "dialNumber": "-555-1234",
+                    "type": "mobile"
+                },
+                "ssn": "999-99-9999"
+            }
+        },
+        "payPeriod": 0,
+        "payment": {
+            "singlePay": {
+                "banking": {
+                    "eft": {
+                        "accountNumber": "444444444",
+                        "accountType": "checking",
+                        "bankName": "t",
+                        "routingNumber": "444444444"
+                    }
+                }
+            }
+        },
+        "planName": "Product8",
+        "primaryInsuredIsOwner": false,
+        "productType": "Precoa",
+        "replacement": {
+            "isReplacement": true
+        },
+        "totalFuneralPrice": 3494
+    }
+}
